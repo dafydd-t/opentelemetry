@@ -4,7 +4,6 @@
 use core::fmt;
 use opentelemetry::global;
 use opentelemetry::metrics::Counter;
-use opentelemetry_instrumentation_actix_web::ClientExt;
 use std::sync::LazyLock;
 use std::{collections::HashMap, env};
 
@@ -67,7 +66,6 @@ async fn request_quote(count: u32) -> Result<f64, anyhow::Error> {
 
     let mut response = client
         .post(quote_service_addr)
-        .trace_request()
         .send_json(&reqbody)
         .await
         .map_err(|err| anyhow::anyhow!("Failed to call quote service: {err}"))?;

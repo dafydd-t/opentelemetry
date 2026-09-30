@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Grpc.Core;
@@ -171,7 +172,7 @@ public class ValkeyCartStore : ICartStore
         }
         finally
         {
-            addItemHistogram.Record(stopwatch.Elapsed.TotalSeconds);
+            addItemHistogram.Record(stopwatch.Elapsed.TotalSeconds, new KeyValuePair<string, object>("user.id", userId));
         }
     }
 
@@ -222,7 +223,7 @@ public class ValkeyCartStore : ICartStore
         }
         finally
         {
-            getCartHistogram.Record(stopwatch.Elapsed.TotalSeconds);
+            getCartHistogram.Record(stopwatch.Elapsed.TotalSeconds, new KeyValuePair<string, object>("user.id", userId));
         }
     }
 

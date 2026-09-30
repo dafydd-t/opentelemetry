@@ -4,7 +4,7 @@
 use actix_web::{web, App, HttpResponse, HttpServer};
 use open_feature::provider::FeatureProvider;
 use open_feature_flagd::{FlagdOptions, FlagdProvider};
-use opentelemetry_instrumentation_actix_web::{RequestMetrics, RequestTracing};
+use opentelemetry_instrumentation_actix_web::RequestTracing;
 use std::env;
 use std::sync::Arc;
 use tracing::info;
@@ -60,7 +60,6 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(flag_provider.clone())
             .wrap(RequestTracing::new())
-            .wrap(RequestMetrics::default())
             .service(get_quote)
             .service(ship_order)
             .route(

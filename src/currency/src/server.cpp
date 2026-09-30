@@ -257,8 +257,6 @@ class CurrencyService final : public oteldemo::CurrencyService::Service
       return Status::OK;
 
     } catch(...) {
-      span->AddEvent("Conversion failed");
-      span->SetStatus(StatusCode::kError);
 
       logger->Error(eventName("currency.conversion_failed"), "conversion failure");
 

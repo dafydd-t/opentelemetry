@@ -41,7 +41,7 @@ function calculateQuote($jsonObject): float
             ->createCounter('quotes', 'quotes', 'number of quotes calculated');
         $counter->add(1, ['number_of_items' => $numberOfItems]);
     } catch (\Exception $exception) {
-        $childSpan->recordException($exception);
+        // fall through and return the default quote
     } finally {
         $childSpan->end();
         return $quote;

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { NextApiHandler } from 'next';
-import {context, Exception, Span, SpanStatusCode, trace} from '@opentelemetry/api';
+import {context, Span, trace} from '@opentelemetry/api';
 import {
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
@@ -29,8 +29,6 @@ const InstrumentationMiddleware = (handler: NextApiHandler): NextApiHandler => {
         'API request completed'
       );
     } catch (error) {
-      span.recordException(error as Exception);
-      span.setStatus({ code: SpanStatusCode.ERROR });
       httpStatus = 500;
       logger.error(
         {
