@@ -7,6 +7,7 @@
 # Python
 import os
 import random
+import time
 from concurrent import futures
 
 # Pip
@@ -95,6 +96,16 @@ def get_product_list(request_product_ids):
 
         # Create a filtered list of products excluding the products received as input
         filtered_products = list(set(product_ids) - set(request_product_ids))
+
+        # Only recommend products that are still available in the catalog
+        start = time.monotonic()
+        num_candidates = len(filtered_products)
+        filtered_products = [p for p in filtered_products if is_product_available(p)]
+        logger.info(
+            f"get_product_list: checked availability of {num_candidates} products "
+            f"individually in {(time.monotonic() - start) * 1000:.1f}ms"
+        )
+
         num_products = len(filtered_products)
         span.set_attribute("demo.product.filtered.count", num_products)
         num_return = min(max_responses, num_products)
@@ -107,6 +118,17 @@ def get_product_list(request_product_ids):
         span.set_attribute("demo.product.filtered.list", prod_list)
 
         return prod_list
+
+
+def is_product_available(product_id):
+    with grpc.insecure_channel(catalog_addr) as channel:
+        stub = demo_pb2_grpc.ProductCatalogServiceStub(channel)
+        try:
+            stub.GetProduct(demo_pb2.GetProductRequest(id=product_id))
+            return True
+        except grpc.RpcError as e:
+            logger.warning(f"product {product_id} unavailable: {e.code()}")
+            return False
 
 
 def must_map_env(key: str):
